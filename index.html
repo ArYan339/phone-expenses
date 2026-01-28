@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhoneFlip - Buy & Sell Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --success: #34d399;
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --bg-dark: #0a0f1a;
+            --bg-card: rgba(30, 41, 59, 0.6);
+            --bg-card-solid: #1e293b;
+            --bg-card-hover: rgba(51, 65, 85, 0.7);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: rgba(99, 102, 241, 0.2);
+            --glass-bg: rgba(15, 23, 42, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --glow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            background-image:
+                radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(79, 70, 229, 0.08) 0%, transparent 60%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .data-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .data-btn {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .data-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: var(--glow);
+        }
+
+        .sync-status {
+            margin-top: 12px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .sync-status i {
+            color: var(--success);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 18px 12px;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow), var(--glow);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .stat-card.profit {
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(16, 185, 129, 0.05));
+            border-color: rgba(52, 211, 153, 0.4);
+        }
+
+        .stat-card.loss {
+            background: linear-gradient(135deg, rgba(248, 113, 113, 0.15), rgba(239, 68, 68, 0.05));
+            border-color: rgba(248, 113, 113, 0.4);
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 1.1rem;
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            background: var(--gradient-1);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: var(--gradient-2);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: var(--gradient-3);
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 6px;
+            margin-bottom: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            color: var(--text-secondary);
+        }
+
+        .tab.active {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .tab:hover:not(.active) {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Phone List */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .filter-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .phone-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .phone-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 18px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .phone-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+        }
+
+        .phone-card.buy::before {
+            background: var(--gradient-1);
+        }
+
+        .phone-card.sell::before {
+            background: linear-gradient(180deg, var(--success), #059669);
+        }
+
+        .phone-card.pending::before {
+            background: linear-gradient(180deg, var(--warning), #d97706);
+        }
+
+        .phone-card:hover {
+            transform: translateX(8px) translateY(-2px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: var(--shadow), var(--glow);
+        }
+
+        .phone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .phone-brand {
+            font-size: 0.75rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .phone-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .phone-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-buy {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+
+        .badge-sell {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge-pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .phone-details {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .detail-item i {
+            font-size: 0.8rem;
+        }
+
+        .phone-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .phone-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .phone-price.profit {
+            color: var(--success);
+        }
+
+        .phone-price.loss {
+            color: var(--danger);
+        }
+
+        .phone-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .phone-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .action-btn.edit {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+
+        .action-btn.delete {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .action-btn.sell {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* FAB */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+            transition: all 0.3s;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .fab:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 28px 28px 0 0;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px 25px;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--glass-border);
+            border-bottom: none;
+            box-shadow: 0 -10px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-dark);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-select {
+            cursor: pointer;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .type-selector {
+            display: flex;
+            gap: 12px;
+        }
+
+        .type-option {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--bg-dark);
+        }
+
+        .type-option.active {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .type-option i {
+            font-size: 1.3rem;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .type-option span {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .type-option.buy.active i {
+            color: var(--primary);
+        }
+
+        .type-option.sell.active i {
+            color: var(--success);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--gradient-1);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Quick Add Phones */
+        .quick-phones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .quick-phone {
+            padding: 8px 14px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-phone:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Search */
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 16px 14px 45px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .phone-card {
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Profit Indicator */
+        .profit-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+
+        .profit-indicator.positive {
+            color: var(--success);
+        }
+
+        .profit-indicator.negative {
+            color: var(--danger);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-mobile-alt"></i> PhoneFlip</h1>
+            <p>Track Your Phone Trading Business</p>
+            <div class="data-actions">
+                <button class="data-btn" id="exportBtn" title="Export to CSV">
+                    <i class="fas fa-download"></i> Export
+                </button>
+                <button class="data-btn" id="importBtn" title="Import from CSV">
+                    <i class="fas fa-upload"></i> Import
+                </button>
+                <input type="file" id="importFile" accept=".csv" style="display: none;">
+            </div>
+            <div class="sync-status" id="syncStatus">
+                <i class="fas fa-database"></i> <span id="syncText">Data saved locally</span>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="stat-value" id="totalBought">0</div>
+                <div class="stat-label">Bought</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                <div class="stat-value" id="totalSold">0</div>
+                <div class="stat-label">Sold</div>
+            </div>
+            <div class="stat-card" id="profitCard">
+                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="stat-value" id="totalProfit">$0</div>
+                <div class="stat-label">Profit</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" data-tab="all">All</div>
+            <div class="tab" data-tab="inventory">Inventory</div>
+            <div class="tab" data-tab="sold">Sold</div>
+        </div>
+
+        <!-- Search -->
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search phones...">
+        </div>
+
+        <!-- Phone List -->
+        <div class="section-header">
+            <h2 class="section-title">Transactions</h2>
+            <button class="filter-btn" id="sortBtn">
+                <i class="fas fa-sort"></i> Latest
+            </button>
+        </div>
+
+        <div class="phone-list" id="phoneList">
+            <!-- Cards will be inserted here -->
+        </div>
+    </div>
+
+    <!-- FAB -->
+    <button class="fab" id="addBtn">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Add Phone</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="phoneForm">
+                <input type="hidden" id="phoneId">
+
+                <div class="form-group">
+                    <label class="form-label">Transaction Type</label>
+                    <div class="type-selector">
+                        <div class="type-option buy active" data-type="buy">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Buy</span>
+                        </div>
+                        <div class="type-option sell" data-type="sell">
+                            <i class="fas fa-hand-holding-usd"></i>
+                            <span>Sell</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone Brand</label>
+                    <select class="form-select" id="phoneBrand" required>
+                        <option value="">Select Brand</option>
+                        <option value="Apple">Apple</option>
+                        <option value="Samsung">Samsung</option>
+                        <option value="Google">Google</option>
+                        <option value="OnePlus">OnePlus</option>
+                        <option value="Xiaomi">Xiaomi</option>
+                        <option value="Huawei">Huawei</option>
+                        <option value="Sony">Sony</option>
+                        <option value="OPPO">OPPO</option>
+                        <option value="Vivo">Vivo</option>
+                        <option value="Realme">Realme</option>
+                        <option value="Motorola">Motorola</option>
+                        <option value="Nokia">Nokia</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone Model</label>
+                    <input type="text" class="form-input" id="phoneModel" placeholder="e.g., iPhone 15 Pro Max"
+                        required>
+                    <div class="quick-phones" id="quickPhones">
+                        <!-- Quick suggestions will appear here -->
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Storage</label>
+                        <select class="form-select" id="phoneStorage">
+                            <option value="32GB">32GB</option>
+                            <option value="64GB">64GB</option>
+                            <option value="128GB" selected>128GB</option>
+                            <option value="256GB">256GB</option>
+                            <option value="512GB">512GB</option>
+                            <option value="1TB">1TB</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">RAM</label>
+                        <select class="form-select" id="phoneRam">
+                            <option value="2GB">2GB</option>
+                            <option value="3GB">3GB</option>
+                            <option value="4GB">4GB</option>
+                            <option value="6GB">6GB</option>
+                            <option value="8GB" selected>8GB</option>
+                            <option value="12GB">12GB</option>
+                            <option value="16GB">16GB</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Condition</label>
+                        <select class="form-select" id="phoneCondition">
+                            <option value="New">New (Sealed)</option>
+                            <option value="Like New">Like New</option>
+                            <option value="Excellent">Excellent</option>
+                            <option value="Good" selected>Good</option>
+                            <option value="Fair">Fair</option>
+                            <option value="Poor">Poor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Color</label>
+                        <input type="text" class="form-input" id="phoneColor" placeholder="e.g., Black, Silver">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Price ($)</label>
+                        <input type="number" class="form-input" id="phonePrice" placeholder="0.00" required min="0"
+                            step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-input" id="phoneDate" required>
+                    </div>
+                </div>
+
+                <div class="form-group" id="linkedPhoneGroup" style="display: none;">
+                    <label class="form-label">Link to Purchased Phone</label>
+                    <select class="form-select" id="linkedPhone">
+                        <option value="">Select phone from inventory</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Notes (Optional)</label>
+                    <input type="text" class="form-input" id="phoneNotes" placeholder="Any additional notes...">
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-save"></i> Save Transaction
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Phone model suggestions by brand
+        const phoneModels = {
+            'Apple': [
+                'iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15 Plus', 'iPhone 15',
+                'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 14 Plus', 'iPhone 14',
+                'iPhone 13 Pro Max', 'iPhone 13 Pro', 'iPhone 13', 'iPhone 13 Mini',
+                'iPhone 12 Pro Max', 'iPhone 12 Pro', 'iPhone 12', 'iPhone 12 Mini',
+                'iPhone SE (2022)', 'iPhone SE (2020)', 'iPhone 11 Pro Max', 'iPhone 11'
+            ],
+            'Samsung': [
+                'Galaxy S24 Ultra', 'Galaxy S24+', 'Galaxy S24',
+                'Galaxy S23 Ultra', 'Galaxy S23+', 'Galaxy S23', 'Galaxy S23 FE',
+                'Galaxy Z Fold 5', 'Galaxy Z Flip 5', 'Galaxy Z Fold 4', 'Galaxy Z Flip 4',
+                'Galaxy A54 5G', 'Galaxy A34 5G', 'Galaxy A24', 'Galaxy A14 5G',
+                'Galaxy Note 20 Ultra', 'Galaxy S22 Ultra', 'Galaxy S21 Ultra'
+            ],
+            'Google': [
+                'Pixel 8 Pro', 'Pixel 8', 'Pixel 8a',
+                'Pixel 7 Pro', 'Pixel 7', 'Pixel 7a',
+                'Pixel 6 Pro', 'Pixel 6', 'Pixel 6a',
+                'Pixel Fold'
+            ],
+            'OnePlus': [
+                'OnePlus 12', 'OnePlus 12R', 'OnePlus Open',
+                'OnePlus 11', 'OnePlus 11R',
+                'OnePlus 10 Pro', 'OnePlus 10T',
+                'OnePlus Nord 3', 'OnePlus Nord CE 3'
+            ],
+            'Xiaomi': [
+                'Xiaomi 14 Ultra', 'Xiaomi 14 Pro', 'Xiaomi 14',
+                'Xiaomi 13 Ultra', 'Xiaomi 13 Pro', 'Xiaomi 13',
+                'Redmi Note 13 Pro+', 'Redmi Note 13 Pro', 'Redmi Note 13',
+                'POCO F5 Pro', 'POCO F5', 'POCO X5 Pro'
+            ],
+            'Huawei': [
+                'Mate 60 Pro+', 'Mate 60 Pro', 'Mate 60',
+                'P60 Pro', 'P60 Art', 'P60',
+                'Nova 11 Ultra', 'Nova 11 Pro'
+            ],
+            'Sony': [
+                'Xperia 1 V', 'Xperia 5 V', 'Xperia 10 V',
+                'Xperia 1 IV', 'Xperia 5 IV', 'Xperia Pro-I'
+            ],
+            'OPPO': [
+                'Find X7 Ultra', 'Find X7 Pro', 'Find X7',
+                'Find N3 Flip', 'Find N3',
+                'Reno 11 Pro', 'Reno 11', 'A98 5G'
+            ],
+            'Vivo': [
+                'X100 Pro', 'X100', 'X90 Pro+',
+                'V30 Pro', 'V30', 'Y100'
+            ],
+            'Realme': [
+                'GT 5 Pro', 'GT 5', 'GT Neo 5',
+                '12 Pro+', '12 Pro', 'Narzo 60 Pro'
+            ],
+            'Motorola': [
+                'Edge 40 Pro', 'Edge 40', 'Edge 40 Neo',
+                'Razr 40 Ultra', 'Razr 40',
+                'Moto G84', 'Moto G54'
+            ],
+            'Nokia': [
+                'X30', 'G60', 'G42', 'C32'
+            ]
+        };
+
+        // App State
+        let phones = JSON.parse(localStorage.getItem('phones')) || [];
+        let currentTab = 'all';
+        let sortOrder = 'desc';
+        let editingId = null;
+
+        // DOM Elements
+        const phoneList = document.getElementById('phoneList');
+        const modal = document.getElementById('modal');
+        const phoneForm = document.getElementById('phoneForm');
+        const searchInput = document.getElementById('searchInput');
+        const tabs = document.querySelectorAll('.tab');
+        const sortBtn = document.getElementById('sortBtn');
+        const addBtn = document.getElementById('addBtn');
+        const modalClose = document.getElementById('modalClose');
+        const typeOptions = document.querySelectorAll('.type-option');
+        const phoneBrand = document.getElementById('phoneBrand');
+        const phoneModel = document.getElementById('phoneModel');
+        const quickPhones = document.getElementById('quickPhones');
+        const linkedPhoneGroup = document.getElementById('linkedPhoneGroup');
+        const linkedPhone = document.getElementById('linkedPhone');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPhones();
+            updateStats();
+            document.getElementById('phoneDate').valueAsDate = new Date();
+        });
+
+        // Event Listeners
+        addBtn.addEventListener('click', () => openModal());
+        modalClose.addEventListener('click', () => closeModal());
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        typeOptions.forEach(opt => {
+            opt.addEventListener('click', () => {
+                typeOptions.forEach(o => o.classList.remove('active'));
+                opt.classList.add('active');
+
+                if (opt.dataset.type === 'sell') {
+                    linkedPhoneGroup.style.display = 'block';
+                    populateLinkedPhones();
+                } else {
+                    linkedPhoneGroup.style.display = 'none';
+                }
+            });
+        });
+
+        phoneBrand.addEventListener('change', () => {
+            const brand = phoneBrand.value;
+            if (phoneModels[brand]) {
+                quickPhones.innerHTML = phoneModels[brand].slice(0, 6).map(model =>
+                    `<span class="quick-phone" data-model="${model}">${model}</span>`
+                ).join('');
+            } else {
+                quickPhones.innerHTML = '';
+            }
+        });
+
+        quickPhones.addEventListener('click', (e) => {
+            if (e.target.classList.contains('quick-phone')) {
+                phoneModel.value = e.target.dataset.model;
+            }
+        });
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentTab = tab.dataset.tab;
+                renderPhones();
+            });
+        });
+
+        sortBtn.addEventListener('click', () => {
+            sortOrder = sortOrder === 'desc' ? 'asc' : 'desc';
+            sortBtn.innerHTML = `<i class="fas fa-sort"></i> ${sortOrder === 'desc' ? 'Latest' : 'Oldest'}`;
+            renderPhones();
+        });
+
+        searchInput.addEventListener('input', () => renderPhones());
+
+        phoneForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            savePhone();
+        });
+
+        // Functions
+        function openModal(id = null) {
+            editingId = id;
+            phoneForm.reset();
+            document.getElementById('phoneDate').valueAsDate = new Date();
+
+            if (id) {
+                const phone = phones.find(p => p.id === id);
+                if (phone) {
+                    document.getElementById('modalTitle').textContent = 'Edit Phone';
+                    document.getElementById('phoneId').value = phone.id;
+                    phoneBrand.value = phone.brand;
+                    phoneModel.value = phone.model;
+                    document.getElementById('phoneStorage').value = phone.storage;
+                    document.getElementById('phoneRam').value = phone.ram || '8GB';
+                    document.getElementById('phoneCondition').value = phone.condition;
+                    document.getElementById('phoneColor').value = phone.color || '';
+                    document.getElementById('phonePrice').value = phone.price;
+                    document.getElementById('phoneDate').value = phone.date;
+                    document.getElementById('phoneNotes').value = phone.notes || '';
+
+                    typeOptions.forEach(o => o.classList.remove('active'));
+                    document.querySelector(`.type-option.${phone.type}`).classList.add('active');
+
+                    if (phone.type === 'sell') {
+                        linkedPhoneGroup.style.display = 'block';
+                        populateLinkedPhones();
+                        linkedPhone.value = phone.linkedTo || '';
+                    }
+                }
+            } else {
+                document.getElementById('modalTitle').textContent = 'Add Phone';
+                typeOptions.forEach(o => o.classList.remove('active'));
+                document.querySelector('.type-option.buy').classList.add('active');
+                linkedPhoneGroup.style.display = 'none';
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            editingId = null;
+        }
+
+        function populateLinkedPhones() {
+            const inventory = phones.filter(p => p.type === 'buy' && !p.soldId);
+            linkedPhone.innerHTML = '<option value="">Select phone from inventory</option>' +
+                inventory.map(p => `<option value="${p.id}">${p.brand} ${p.model} - $${p.price}</option>`).join('');
+        }
+
+        function savePhone() {
+            const type = document.querySelector('.type-option.active').dataset.type;
+            const phone = {
+                id: editingId || Date.now().toString(),
+                type,
+                brand: phoneBrand.value,
+                model: phoneModel.value,
+                storage: document.getElementById('phoneStorage').value,
+                ram: document.getElementById('phoneRam').value,
+                condition: document.getElementById('phoneCondition').value,
+                color: document.getElementById('phoneColor').value || '',
+                price: parseFloat(document.getElementById('phonePrice').value),
+                date: document.getElementById('phoneDate').value,
+                notes: document.getElementById('phoneNotes').value,
+                linkedTo: type === 'sell' ? linkedPhone.value : null
+            };
+
+            if (editingId) {
+                const index = phones.findIndex(p => p.id === editingId);
+                phones[index] = phone;
+            } else {
+                phones.push(phone);
+
+                // Link sale to purchase
+                if (type === 'sell' && phone.linkedTo) {
+                    const linkedPurchase = phones.find(p => p.id === phone.linkedTo);
+                    if (linkedPurchase) {
+                        linkedPurchase.soldId = phone.id;
+                    }
+                }
+            }
+
+            saveToIndexedDB();
+            localStorage.setItem('phones', JSON.stringify(phones));
+            renderPhones();
+            updateStats();
+            closeModal();
+        }
+
+        function deletePhone(id) {
+            if (confirm('Are you sure you want to delete this transaction?')) {
+                const phone = phones.find(p => p.id === id);
+
+                // Unlink if necessary
+                if (phone.type === 'buy' && phone.soldId) {
+                    const sale = phones.find(p => p.id === phone.soldId);
+                    if (sale) sale.linkedTo = null;
+                }
+                if (phone.type === 'sell' && phone.linkedTo) {
+                    const purchase = phones.find(p => p.id === phone.linkedTo);
+                    if (purchase) purchase.soldId = null;
+                }
+
+                phones = phones.filter(p => p.id !== id);
+                saveToIndexedDB();
+                localStorage.setItem('phones', JSON.stringify(phones));
+                renderPhones();
+                updateStats();
+            }
+        }
+
+        function markAsSold(id) {
+            const phone = phones.find(p => p.id === id);
+            if (phone) {
+                openModal();
+                typeOptions.forEach(o => o.classList.remove('active'));
+                document.querySelector('.type-option.sell').classList.add('active');
+                phoneBrand.value = phone.brand;
+                phoneModel.value = phone.model;
+                document.getElementById('phoneStorage').value = phone.storage;
+                document.getElementById('phoneCondition').value = phone.condition;
+                linkedPhoneGroup.style.display = 'block';
+                populateLinkedPhones();
+                linkedPhone.value = phone.id;
+            }
+        }
+
+        function renderPhones() {
+            let filtered = [...phones];
+
+            // Filter by tab
+            if (currentTab === 'inventory') {
+                filtered = filtered.filter(p => p.type === 'buy' && !p.soldId);
+            } else if (currentTab === 'sold') {
+                filtered = filtered.filter(p => p.type === 'sell');
+            }
+
+            // Filter by search
+            const search = searchInput.value.toLowerCase();
+            if (search) {
+                filtered = filtered.filter(p =>
+                    p.brand.toLowerCase().includes(search) ||
+                    p.model.toLowerCase().includes(search)
+                );
+            }
+
+            // Sort
+            filtered.sort((a, b) => {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+                return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+            });
+
+            if (filtered.length === 0) {
+                phoneList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-mobile-alt"></i></div>
+                        <p class="empty-text">No phones found. Tap + to add one!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            phoneList.innerHTML = filtered.map(phone => {
+                let profitHtml = '';
+                if (phone.type === 'sell' && phone.linkedTo) {
+                    const purchase = phones.find(p => p.id === phone.linkedTo);
+                    if (purchase) {
+                        const profit = phone.price - purchase.price;
+                        const profitClass = profit >= 0 ? 'positive' : 'negative';
+                        const profitIcon = profit >= 0 ? 'arrow-up' : 'arrow-down';
+                        profitHtml = `
+                            <div class="profit-indicator ${profitClass}">
+                                <i class="fas fa-${profitIcon}"></i>
+                                ${profit >= 0 ? '+' : ''}$${profit.toFixed(2)}
+                            </div>
+                        `;
+                    }
+                }
+
+                const isInInventory = phone.type === 'buy' && !phone.soldId;
+
+                return `
+                    <div class="phone-card ${phone.type} ${isInInventory ? 'pending' : ''}">
+                        <div class="phone-header">
+                            <div>
+                                <div class="phone-brand">${phone.brand}</div>
+                                <div class="phone-name">${phone.model}</div>
+                            </div>
+                            <span class="phone-badge badge-${isInInventory ? 'pending' : phone.type}">
+                                ${isInInventory ? 'In Stock' : phone.type === 'buy' ? 'Purchased' : 'Sold'}
+                            </span>
+                        </div>
+                        <div class="phone-details">
+                            <div class="detail-item">
+                                <i class="fas fa-hdd"></i> ${phone.storage}
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-memory"></i> ${phone.ram || '8GB'}
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-star"></i> ${phone.condition}
+                            </div>
+                        </div>
+                        <div class="phone-footer">
+                            <div>
+                                <div class="phone-price ${phone.type === 'sell' ? 'profit' : ''}">$${phone.price.toFixed(2)}</div>
+                                ${profitHtml}
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div class="phone-date">${formatDate(phone.date)}</div>
+                                <div class="phone-actions">
+                                    ${isInInventory ? `
+                                        <button class="action-btn sell" onclick="markAsSold('${phone.id}')" title="Mark as Sold">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </button>
+                                    ` : ''}
+                                    <button class="action-btn edit" onclick="openModal('${phone.id}')" title="Edit">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    <button class="action-btn delete" onclick="deletePhone('${phone.id}')" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateStats() {
+            const bought = phones.filter(p => p.type === 'buy');
+            const sold = phones.filter(p => p.type === 'sell');
+
+            let totalProfit = 0;
+            sold.forEach(sale => {
+                if (sale.linkedTo) {
+                    const purchase = phones.find(p => p.id === sale.linkedTo);
+                    if (purchase) {
+                        totalProfit += sale.price - purchase.price;
+                    }
+                } else {
+                    totalProfit += sale.price;
+                }
+            });
+
+            document.getElementById('totalBought').textContent = bought.length;
+            document.getElementById('totalSold').textContent = sold.length;
+            document.getElementById('totalProfit').textContent = `$${totalProfit.toFixed(0)}`;
+
+            const profitCard = document.getElementById('profitCard');
+            profitCard.classList.remove('profit', 'loss');
+            if (totalProfit > 0) {
+                profitCard.classList.add('profit');
+            } else if (totalProfit < 0) {
+                profitCard.classList.add('loss');
+            }
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const options = { month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Database Functions - IndexedDB
+        const DB_NAME = 'PhoneFlipDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'phones';
+
+        function openDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve(request.result);
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                    }
+                };
+            });
+        }
+
+        async function saveToIndexedDB() {
+            try {
+                const db = await openDatabase();
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+
+                // Clear and re-add all phones
+                store.clear();
+                phones.forEach(phone => store.add(phone));
+
+                await tx.complete;
+                updateSyncStatus('Saved to device');
+            } catch (error) {
+                console.error('IndexedDB save error:', error);
+                // Fallback to localStorage
+                localStorage.setItem('phones', JSON.stringify(phones));
+                updateSyncStatus('Saved locally');
+            }
+        }
+
+        async function loadFromIndexedDB() {
+            try {
+                const db = await openDatabase();
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.getAll();
+
+                return new Promise((resolve, reject) => {
+                    request.onsuccess = () => {
+                        if (request.result.length > 0) {
+                            phones = request.result;
+                            updateSyncStatus('Loaded from device');
+                        }
+                        resolve();
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+            } catch (error) {
+                console.error('IndexedDB load error:', error);
+                // Fallback to localStorage
+                phones = JSON.parse(localStorage.getItem('phones')) || [];
+            }
+        }
+
+        function updateSyncStatus(message) {
+            const syncText = document.getElementById('syncText');
+            if (syncText) {
+                syncText.textContent = `${message} • ${new Date().toLocaleTimeString()}`;
+            }
+        }
+
+        // Export to CSV
+        function exportToCSV() {
+            const headers = ['ID', 'Type', 'Brand', 'Model', 'Storage', 'RAM', 'Condition', 'Color', 'Price', 'Date', 'Notes', 'LinkedTo', 'SoldId'];
+            const csvContent = [
+                headers.join(','),
+                ...phones.map(p => [
+                    p.id,
+                    p.type,
+                    `"${p.brand}"`,
+                    `"${p.model}"`,
+                    p.storage,
+                    p.ram || '8GB',
+                    p.condition,
+                    `"${p.color || ''}"`,
+                    p.price,
+                    p.date,
+                    `"${(p.notes || '').replace(/"/g, '""')}"`,
+                    p.linkedTo || '',
+                    p.soldId || ''
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `phoneflip_backup_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            updateSyncStatus('Exported to CSV');
+        }
+
+        // Import from CSV
+        function importFromCSV(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const lines = e.target.result.split('\n');
+                    const headers = lines[0].split(',');
+
+                    const newPhones = lines.slice(1).filter(line => line.trim()).map(line => {
+                        const values = line.match(/(".*?"|[^,]+)/g) || [];
+                        const clean = (v) => v ? v.replace(/^"|"$/g, '').replace(/""/g, '"') : '';
+
+                        return {
+                            id: values[0] || Date.now().toString(),
+                            type: values[1] || 'buy',
+                            brand: clean(values[2]),
+                            model: clean(values[3]),
+                            storage: values[4] || '128GB',
+                            ram: values[5] || '8GB',
+                            condition: values[6] || 'Good',
+                            color: clean(values[7]),
+                            price: parseFloat(values[8]) || 0,
+                            date: values[9] || new Date().toISOString().split('T')[0],
+                            notes: clean(values[10]),
+                            linkedTo: values[11] || null,
+                            soldId: values[12] || null
+                        };
+                    });
+
+                    if (confirm(`Import ${newPhones.length} phones? This will replace existing data.`)) {
+                        phones = newPhones;
+                        saveToIndexedDB();
+                        localStorage.setItem('phones', JSON.stringify(phones));
+                        renderPhones();
+                        updateStats();
+                        updateSyncStatus('Imported from CSV');
+                    }
+                } catch (error) {
+                    alert('Error importing CSV: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Export/Import Event Listeners
+        document.getElementById('exportBtn').addEventListener('click', exportToCSV);
+        document.getElementById('importBtn').addEventListener('click', () => {
+            document.getElementById('importFile').click();
+        });
+        document.getElementById('importFile').addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                importFromCSV(e.target.files[0]);
+                e.target.value = '';
+            }
+        });
+
+        // Initialize with IndexedDB
+        loadFromIndexedDB().then(() => {
+            renderPhones();
+            updateStats();
+        });
+    </script>
+</body>
+
+</html>
