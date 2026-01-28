@@ -761,6 +761,12 @@
                 <button class="data-btn" id="importBtn" title="Import from CSV">
                     <i class="fas fa-upload"></i> Import
                 </button>
+                <button class="data-btn" id="syncCloudBtn" title="Sync with Cloud">
+                    <i class="fas fa-cloud-upload-alt"></i> Sync
+                </button>
+                <button class="data-btn" id="settingsBtn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
                 <input type="file" id="importFile" accept=".csv" style="display: none;">
             </div>
             <div class="sync-status" id="syncStatus">
@@ -813,6 +819,42 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Cloud Sync Settings</h3>
+                <button class="modal-close" id="settingsClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Google Apps Script URL</label>
+                <input type="text" class="form-input" id="cloudUrl"
+                    placeholder="https://script.google.com/macros/s/.../exec">
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 8px;">
+                    Paste your Google Apps Script Web App URL here to enable cloud sync.
+                </p>
+            </div>
+            <button class="submit-btn" id="saveSettingsBtn">
+                <i class="fas fa-save"></i> Save Settings
+            </button>
+
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--glass-border);">
+                <h4 style="margin-bottom: 12px; font-size: 0.9rem;">How to Setup Cloud Sync?</h4>
+                <ol style="font-size: 0.8rem; color: var(--text-secondary); margin-left: 20px; line-height: 1.6;">
+                    <li>Create a new <b>Google Sheet</b>.</li>
+                    <li>Go to <b>Extensions > Apps Script</b>.</li>
+                    <li>Delete all code and paste the backend script (available in our guide).</li>
+                    <li>Click <b>Deploy > New Deployment</b>.</li>
+                    <li>Select type: <b>Web App</b>.</li>
+                    <li>Access: <b>Anyone</b>.</li>
+                    <li>Copy the <b>Web App URL</b> and paste it above.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
     <!-- FAB -->
     <button class="fab" id="addBtn">
         <i class="fas fa-plus"></i>
@@ -842,79 +884,105 @@
                             <i class="fas fa-hand-holding-usd"></i>
                             <span>Sell</span>
                         </div>
+                        <div class="type-option expense" data-type="expense">
+                            <i class="fas fa-receipt"></i>
+                            <span>Expense</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Phone Brand</label>
-                    <select class="form-select" id="phoneBrand" required>
-                        <option value="">Select Brand</option>
-                        <option value="Apple">Apple</option>
-                        <option value="Samsung">Samsung</option>
-                        <option value="Google">Google</option>
-                        <option value="OnePlus">OnePlus</option>
-                        <option value="Xiaomi">Xiaomi</option>
-                        <option value="Huawei">Huawei</option>
-                        <option value="Sony">Sony</option>
-                        <option value="OPPO">OPPO</option>
-                        <option value="Vivo">Vivo</option>
-                        <option value="Realme">Realme</option>
-                        <option value="Motorola">Motorola</option>
-                        <option value="Nokia">Nokia</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Phone Model</label>
-                    <input type="text" class="form-input" id="phoneModel" placeholder="e.g., iPhone 15 Pro Max"
-                        required>
-                    <div class="quick-phones" id="quickPhones">
-                        <!-- Quick suggestions will appear here -->
-                    </div>
-                </div>
-
-                <div class="form-row">
+                <!-- Phone Specific Fields -->
+                <div id="phoneDetailFields">
                     <div class="form-group">
-                        <label class="form-label">Storage</label>
-                        <select class="form-select" id="phoneStorage">
-                            <option value="32GB">32GB</option>
-                            <option value="64GB">64GB</option>
-                            <option value="128GB" selected>128GB</option>
-                            <option value="256GB">256GB</option>
-                            <option value="512GB">512GB</option>
-                            <option value="1TB">1TB</option>
+                        <label class="form-label">Phone Brand</label>
+                        <select class="form-select" id="phoneBrand">
+                            <option value="">Select Brand</option>
+                            <option value="Apple">Apple</option>
+                            <option value="Samsung">Samsung</option>
+                            <option value="Google">Google</option>
+                            <option value="OnePlus">OnePlus</option>
+                            <option value="Xiaomi">Xiaomi</option>
+                            <option value="Huawei">Huawei</option>
+                            <option value="Sony">Sony</option>
+                            <option value="OPPO">OPPO</option>
+                            <option value="Vivo">Vivo</option>
+                            <option value="Realme">Realme</option>
+                            <option value="Motorola">Motorola</option>
+                            <option value="Nokia">Nokia</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label class="form-label">RAM</label>
-                        <select class="form-select" id="phoneRam">
-                            <option value="2GB">2GB</option>
-                            <option value="3GB">3GB</option>
-                            <option value="4GB">4GB</option>
-                            <option value="6GB">6GB</option>
-                            <option value="8GB" selected>8GB</option>
-                            <option value="12GB">12GB</option>
-                            <option value="16GB">16GB</option>
-                        </select>
+                        <label class="form-label">Phone Model</label>
+                        <input type="text" class="form-input" id="phoneModel" placeholder="e.g., iPhone 15 Pro Max">
+                        <div class="quick-phones" id="quickPhones">
+                            <!-- Quick suggestions will appear here -->
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Storage</label>
+                            <select class="form-select" id="phoneStorage">
+                                <option value="32GB">32GB</option>
+                                <option value="64GB">64GB</option>
+                                <option value="128GB" selected>128GB</option>
+                                <option value="256GB">256GB</option>
+                                <option value="512GB">512GB</option>
+                                <option value="1TB">1TB</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">RAM</label>
+                            <select class="form-select" id="phoneRam">
+                                <option value="2GB">2GB</option>
+                                <option value="3GB">3GB</option>
+                                <option value="4GB">4GB</option>
+                                <option value="6GB">6GB</option>
+                                <option value="8GB" selected>8GB</option>
+                                <option value="12GB">12GB</option>
+                                <option value="16GB">16GB</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Condition</label>
+                            <select class="form-select" id="phoneCondition">
+                                <option value="New">New (Sealed)</option>
+                                <option value="Like New">Like New</option>
+                                <option value="Excellent">Excellent</option>
+                                <option value="Good" selected>Good</option>
+                                <option value="Fair">Fair</option>
+                                <option value="Poor">Poor</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Color</label>
+                            <input type="text" class="form-input" id="phoneColor" placeholder="e.g., Black, Silver">
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-row">
+                <!-- Expense Specific Fields (Hidden by default) -->
+                <div id="expenseFields" style="display: none;">
                     <div class="form-group">
-                        <label class="form-label">Condition</label>
-                        <select class="form-select" id="phoneCondition">
-                            <option value="New">New (Sealed)</option>
-                            <option value="Like New">Like New</option>
-                            <option value="Excellent">Excellent</option>
-                            <option value="Good" selected>Good</option>
-                            <option value="Fair">Fair</option>
-                            <option value="Poor">Poor</option>
-                        </select>
+                        <label class="form-label">Expense Name</label>
+                        <input type="text" class="form-input" id="expenseName"
+                            placeholder="e.g., Screen Repair, Packaging">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Color</label>
-                        <input type="text" class="form-input" id="phoneColor" placeholder="e.g., Black, Silver">
+                        <label class="form-label">Category</label>
+                        <select class="form-select" id="expenseCategory">
+                            <option value="Repair">Repair</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Packaging">Packaging</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Taxes">Taxes</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
                 </div>
 
@@ -1021,35 +1089,55 @@
         let currentTab = 'all';
         let sortOrder = 'desc';
         let editingId = null;
+        let cloudUrl = localStorage.getItem('cloudUrl') || '';
 
         // DOM Elements
         const phoneList = document.getElementById('phoneList');
         const modal = document.getElementById('modal');
+        const settingsModal = document.getElementById('settingsModal');
         const phoneForm = document.getElementById('phoneForm');
         const searchInput = document.getElementById('searchInput');
         const tabs = document.querySelectorAll('.tab');
         const sortBtn = document.getElementById('sortBtn');
         const addBtn = document.getElementById('addBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const syncCloudBtn = document.getElementById('syncCloudBtn');
         const modalClose = document.getElementById('modalClose');
+        const settingsClose = document.getElementById('settingsClose');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
         const typeOptions = document.querySelectorAll('.type-option');
         const phoneBrand = document.getElementById('phoneBrand');
         const phoneModel = document.getElementById('phoneModel');
         const quickPhones = document.getElementById('quickPhones');
         const linkedPhoneGroup = document.getElementById('linkedPhoneGroup');
         const linkedPhone = document.getElementById('linkedPhone');
+        const phoneDetailFields = document.getElementById('phoneDetailFields');
+        const expenseFields = document.getElementById('expenseFields');
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            renderPhones();
-            updateStats();
             document.getElementById('phoneDate').valueAsDate = new Date();
+            if (cloudUrl) document.getElementById('cloudUrl').value = cloudUrl;
         });
 
         // Event Listeners
         addBtn.addEventListener('click', () => openModal());
+        settingsBtn.addEventListener('click', () => settingsModal.classList.add('active'));
+        settingsClose.addEventListener('click', () => settingsModal.classList.remove('active'));
+        saveSettingsBtn.addEventListener('click', () => {
+            cloudUrl = document.getElementById('cloudUrl').value;
+            localStorage.setItem('cloudUrl', cloudUrl);
+            settingsModal.classList.remove('active');
+            updateSyncStatus('Settings saved');
+        });
+        syncCloudBtn.addEventListener('click', () => syncWithCloud());
+
         modalClose.addEventListener('click', () => closeModal());
         modal.addEventListener('click', (e) => {
             if (e.target === modal) closeModal();
+        });
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) settingsModal.classList.remove('active');
         });
 
         typeOptions.forEach(opt => {
@@ -1057,11 +1145,20 @@
                 typeOptions.forEach(o => o.classList.remove('active'));
                 opt.classList.add('active');
 
-                if (opt.dataset.type === 'sell') {
+                const type = opt.dataset.type;
+                if (type === 'sell') {
                     linkedPhoneGroup.style.display = 'block';
+                    phoneDetailFields.style.display = 'block';
+                    expenseFields.style.display = 'none';
                     populateLinkedPhones();
+                } else if (type === 'expense') {
+                    linkedPhoneGroup.style.display = 'none';
+                    phoneDetailFields.style.display = 'none';
+                    expenseFields.style.display = 'block';
                 } else {
                     linkedPhoneGroup.style.display = 'none';
+                    phoneDetailFields.style.display = 'block';
+                    expenseFields.style.display = 'none';
                 }
             });
         });
@@ -1111,35 +1208,49 @@
             phoneForm.reset();
             document.getElementById('phoneDate').valueAsDate = new Date();
 
+            // Default UI state
+            linkedPhoneGroup.style.display = 'none';
+            phoneDetailFields.style.display = 'block';
+            expenseFields.style.display = 'none';
+            typeOptions.forEach(o => o.classList.remove('active'));
+            document.querySelector('.type-option.buy').classList.add('active');
+
             if (id) {
                 const phone = phones.find(p => p.id === id);
                 if (phone) {
-                    document.getElementById('modalTitle').textContent = 'Edit Phone';
+                    document.getElementById('modalTitle').textContent = 'Edit ' + (phone.type === 'expense' ? 'Expense' : 'Phone');
                     document.getElementById('phoneId').value = phone.id;
-                    phoneBrand.value = phone.brand;
-                    phoneModel.value = phone.model;
-                    document.getElementById('phoneStorage').value = phone.storage;
-                    document.getElementById('phoneRam').value = phone.ram || '8GB';
-                    document.getElementById('phoneCondition').value = phone.condition;
-                    document.getElementById('phoneColor').value = phone.color || '';
-                    document.getElementById('phonePrice').value = phone.price;
                     document.getElementById('phoneDate').value = phone.date;
                     document.getElementById('phoneNotes').value = phone.notes || '';
+                    document.getElementById('phonePrice').value = phone.price;
 
                     typeOptions.forEach(o => o.classList.remove('active'));
                     document.querySelector(`.type-option.${phone.type}`).classList.add('active');
 
-                    if (phone.type === 'sell') {
-                        linkedPhoneGroup.style.display = 'block';
-                        populateLinkedPhones();
-                        linkedPhone.value = phone.linkedTo || '';
+                    if (phone.type === 'expense') {
+                        phoneDetailFields.style.display = 'none';
+                        expenseFields.style.display = 'block';
+                        document.getElementById('expenseName').value = phone.expenseName || '';
+                        document.getElementById('expenseCategory').value = phone.expenseCategory || 'Other';
+                    } else {
+                        phoneDetailFields.style.display = 'block';
+                        expenseFields.style.display = 'none';
+                        phoneBrand.value = phone.brand || '';
+                        phoneModel.value = phone.model || '';
+                        document.getElementById('phoneStorage').value = phone.storage || '128GB';
+                        document.getElementById('phoneRam').value = phone.ram || '8GB';
+                        document.getElementById('phoneCondition').value = phone.condition || 'Good';
+                        document.getElementById('phoneColor').value = phone.color || '';
+
+                        if (phone.type === 'sell') {
+                            linkedPhoneGroup.style.display = 'block';
+                            populateLinkedPhones();
+                            linkedPhone.value = phone.linkedTo || '';
+                        }
                     }
                 }
             } else {
-                document.getElementById('modalTitle').textContent = 'Add Phone';
-                typeOptions.forEach(o => o.classList.remove('active'));
-                document.querySelector('.type-option.buy').classList.add('active');
-                linkedPhoneGroup.style.display = 'none';
+                document.getElementById('modalTitle').textContent = 'Add Transaction';
             }
 
             modal.classList.add('active');
@@ -1161,17 +1272,23 @@
             const phone = {
                 id: editingId || Date.now().toString(),
                 type,
-                brand: phoneBrand.value,
-                model: phoneModel.value,
-                storage: document.getElementById('phoneStorage').value,
-                ram: document.getElementById('phoneRam').value,
-                condition: document.getElementById('phoneCondition').value,
-                color: document.getElementById('phoneColor').value || '',
                 price: parseFloat(document.getElementById('phonePrice').value),
                 date: document.getElementById('phoneDate').value,
                 notes: document.getElementById('phoneNotes').value,
-                linkedTo: type === 'sell' ? linkedPhone.value : null
             };
+
+            if (type === 'expense') {
+                phone.expenseName = document.getElementById('expenseName').value;
+                phone.expenseCategory = document.getElementById('expenseCategory').value;
+            } else {
+                phone.brand = phoneBrand.value;
+                phone.model = phoneModel.value;
+                phone.storage = document.getElementById('phoneStorage').value;
+                phone.ram = document.getElementById('phoneRam').value;
+                phone.condition = document.getElementById('phoneCondition').value;
+                phone.color = document.getElementById('phoneColor').value || '';
+                phone.linkedTo = type === 'sell' ? linkedPhone.value : null;
+            }
 
             if (editingId) {
                 const index = phones.findIndex(p => p.id === editingId);
@@ -1270,6 +1387,38 @@
             }
 
             phoneList.innerHTML = filtered.map(phone => {
+                if (phone.type === 'expense') {
+                    return `
+                        <div class="phone-card expense" style="border-left: 4px solid var(--danger);">
+                            <div class="phone-header">
+                                <div>
+                                    <div class="phone-brand">${phone.expenseCategory}</div>
+                                    <div class="phone-name">${phone.expenseName}</div>
+                                </div>
+                                <span class="phone-badge" style="background: rgba(248, 113, 113, 0.2); color: var(--danger);">
+                                    Expense
+                                </span>
+                            </div>
+                            <div class="phone-footer">
+                                <div>
+                                    <div class="phone-price loss">-$${phone.price.toFixed(2)}</div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <div class="phone-date">${formatDate(phone.date)}</div>
+                                    <div class="phone-actions">
+                                        <button class="action-btn edit" onclick="openModal('${phone.id}')" title="Edit">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                        <button class="action-btn delete" onclick="deletePhone('${phone.id}')" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
                 let profitHtml = '';
                 if (phone.type === 'sell' && phone.linkedTo) {
                     const purchase = phones.find(p => p.id === phone.linkedTo);
@@ -1340,28 +1489,44 @@
         function updateStats() {
             const bought = phones.filter(p => p.type === 'buy');
             const sold = phones.filter(p => p.type === 'sell');
+            const expenses = phones.filter(p => p.type === 'expense');
 
-            let totalProfit = 0;
+            let totalInvestment = 0;
+            bought.forEach(p => totalInvestment += p.price);
+
+            let totalSales = 0;
+            sold.forEach(p => totalSales += p.price);
+
+            let totalExpenseAmount = 0;
+            expenses.forEach(p => totalExpenseAmount += p.price);
+
+            // Total Profit = (Total Sales - Cost of Sold Items) - Total Expenses
+            // Here, we simplify to Total Sales - Total Bought - Total Expenses for business overall
+            // but the user might want "Realized Profit". Let's stick to Sales - Purchases - Expenses.
+
+            let realizedProfit = 0;
             sold.forEach(sale => {
                 if (sale.linkedTo) {
                     const purchase = phones.find(p => p.id === sale.linkedTo);
                     if (purchase) {
-                        totalProfit += sale.price - purchase.price;
+                        realizedProfit += sale.price - purchase.price;
                     }
                 } else {
-                    totalProfit += sale.price;
+                    realizedProfit += sale.price;
                 }
             });
 
+            const finalProfit = realizedProfit - totalExpenseAmount;
+
             document.getElementById('totalBought').textContent = bought.length;
             document.getElementById('totalSold').textContent = sold.length;
-            document.getElementById('totalProfit').textContent = `$${totalProfit.toFixed(0)}`;
+            document.getElementById('totalProfit').textContent = `$${finalProfit.toFixed(0)}`;
 
             const profitCard = document.getElementById('profitCard');
             profitCard.classList.remove('profit', 'loss');
-            if (totalProfit > 0) {
+            if (finalProfit > 0) {
                 profitCard.classList.add('profit');
-            } else if (totalProfit < 0) {
+            } else if (finalProfit < 0) {
                 profitCard.classList.add('loss');
             }
         }
@@ -1528,10 +1693,64 @@
             }
         });
 
+        async function syncWithCloud() {
+            if (!cloudUrl) {
+                alert('Please set your Google Apps Script URL in Settings first.');
+                settingsModal.classList.add('active');
+                return;
+            }
+
+            updateSyncStatus('Syncing with cloud...');
+            syncCloudBtn.disabled = true;
+            syncCloudBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing';
+
+            try {
+                // PUSH local data to cloud
+                // Using text/plain to avoid CORS preflight (OPTIONS request) 
+                // while still sending the JSON body.
+                await fetch(cloudUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: JSON.stringify(phones)
+                });
+
+                // Small delay to allow Apps Script to process
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // PULL the latest state from cloud
+                const getResponse = await fetch(cloudUrl);
+                if (!getResponse.ok) throw new Error('Failed to pull from cloud');
+
+                const cloudData = await getResponse.json();
+
+                if (Array.isArray(cloudData)) {
+                    // Update local state with cloud data
+                    phones = cloudData;
+                    renderPhones();
+                    updateStats();
+                    saveToIndexedDB();
+                    localStorage.setItem('phones', JSON.stringify(phones));
+                    updateSyncStatus('Cloud Sync Complete');
+                }
+            } catch (error) {
+                console.error('Cloud sync error:', error);
+                updateSyncStatus('Sync Failed');
+                alert('Cloud sync failed. High-level cause: ' + error.message + '\n\nPlease ensure your Apps Script is deployed as "Web App" with access set to "Anyone".');
+            } finally {
+                syncCloudBtn.disabled = false;
+                syncCloudBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Sync';
+            }
+        }
+
         // Initialize with IndexedDB
         loadFromIndexedDB().then(() => {
             renderPhones();
             updateStats();
+            // Optional: Auto-sync on load if URL exists
+            // if (cloudUrl) syncWithCloud();
         });
     </script>
 </body>
